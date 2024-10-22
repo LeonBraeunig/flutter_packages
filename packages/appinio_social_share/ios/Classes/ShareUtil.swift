@@ -523,8 +523,8 @@ public class ShareUtil{
                 }
                 let pasteboardItems = [
                     [
-                        "com.instagram.sharedSticker.attributionURL": attributionURL ?? "",
-                        "com.instagram.sharedSticker.contentURL": "https://example.com",
+//                        "com.instagram.sharedSticker.attributionURL": attributionURL ?? "",
+//                        "com.instagram.sharedSticker.contentURL": "https://example.com",
                         "com.instagram.sharedSticker.stickerImage": stickerImage ?? "",
                         "com.instagram.sharedSticker.backgroundVideo": backgroundVideoData ?? "",
                         "com.instagram.sharedSticker.backgroundImage": backgroundImage ?? "",
