@@ -531,6 +531,10 @@ public class ShareUtil{
                         "com.instagram.sharedSticker.backgroundBottomColor": backgroundBottomColor ?? "",
                     ]
                 ]
+
+                print("LBLBLBL", pasteboardItems: "")
+
+
                 let pasteboardOptions = [
                     UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(60 * 5)
                 ]
