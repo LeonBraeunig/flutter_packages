@@ -489,38 +489,10 @@ public class ShareUtil{
         result(SUCCESS)
     }
 
-    private var eventSink: FlutterEventSink?
-
-        // Method to set up the event channel
-        public func registerEventChannel(messenger: FlutterBinaryMessenger) {
-            let eventChannel = FlutterEventChannel(name: "appinio_social_share_logs", binaryMessenger: messenger)
-            eventChannel.setStreamHandler(self)
-        }
-
-        // MARK: - FlutterStreamHandler Methods
-
-        public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-            self.eventSink = events
-            return nil
-        }
-
-        public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-            self.eventSink = nil
-            return nil
-        }
-
-        // Helper method to send logs
-        private func sendLog(_ message: String) {
-            eventSink?(message)
-        }
-
     
     func shareToInstagramStory(args : [String: Any?],result: @escaping FlutterResult) {
         if #available(iOS 10.0, *){
-            guard let appId = args[self.argAppId] as? String else {
-                            result(ERROR)
-                            return
-                        }
+            let appId = args[self.argAppId] as? String
             let imagePath = args[self.argbackgroundImage] as? String
             let argVideoFile = args[self.argVideoFile] as? String
             let imagePathSticker = args[self.argstickerImage] as? String
@@ -551,7 +523,8 @@ public class ShareUtil{
                 }
                 let pasteboardItems = [
                     [
-                        "com.instagram.sharedSticker.contentURL": attributionURL ?? "",
+                        "com.instagram.sharedSticker.attributionURL": attributionURL ?? "",
+                        "com.instagram.sharedSticker.contentURL": "https://https://example.com",
                         "com.instagram.sharedSticker.stickerImage": stickerImage ?? "",
                         "com.instagram.sharedSticker.backgroundVideo": backgroundVideoData ?? "",
                         "com.instagram.sharedSticker.backgroundImage": backgroundImage ?? "",
@@ -562,11 +535,6 @@ public class ShareUtil{
                 let pasteboardOptions = [
                     UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(60 * 5)
                 ]
-
-                let logMessage = "Pasteboard Items: \(pasteboardItems)"
-                            print(logMessage) // For console logging
-                            sendLog(logMessage)
-
                 UIPasteboard.general.setItems(pasteboardItems, options: pasteboardOptions)
                 UIApplication.shared.open(instagramURL, options: [:])
                 result(self.SUCCESS)
