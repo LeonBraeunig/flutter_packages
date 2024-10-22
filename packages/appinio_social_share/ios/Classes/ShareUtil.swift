@@ -489,10 +489,38 @@ public class ShareUtil{
         result(SUCCESS)
     }
 
+    private var eventSink: FlutterEventSink?
+
+        // Method to set up the event channel
+        public func registerEventChannel(messenger: FlutterBinaryMessenger) {
+            let eventChannel = FlutterEventChannel(name: "appinio_social_share_logs", binaryMessenger: messenger)
+            eventChannel.setStreamHandler(self)
+        }
+
+        // MARK: - FlutterStreamHandler Methods
+
+        public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+            self.eventSink = events
+            return nil
+        }
+
+        public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+            self.eventSink = nil
+            return nil
+        }
+
+        // Helper method to send logs
+        private func sendLog(_ message: String) {
+            eventSink?(message)
+        }
+
     
     func shareToInstagramStory(args : [String: Any?],result: @escaping FlutterResult) {
         if #available(iOS 10.0, *){
-            let appId = args[self.argAppId] as? String
+            guard let appId = args[self.argAppId] as? String else {
+                            result(ERROR)
+                            return
+                        }
             let imagePath = args[self.argbackgroundImage] as? String
             let argVideoFile = args[self.argVideoFile] as? String
             let imagePathSticker = args[self.argstickerImage] as? String
@@ -531,23 +559,14 @@ public class ShareUtil{
                         "com.instagram.sharedSticker.backgroundBottomColor": backgroundBottomColor ?? "",
                     ]
                 ]
-
-                // Convert pasteboardItems to a serializable format
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: pasteboardItems, options: []) {
-                        if let jsonString = String(data: jsonData, encoding: .utf8) {
-                            // Send the log back via result
-                            result(jsonString)
-                        } else {
-                            result(FlutterError(code: "LOG_ERROR", message: "Failed to encode log", details: nil))
-                        }
-                    } else {
-                        result(FlutterError(code: "LOG_ERROR", message: "Failed to serialize log", details: nil))
-                    }
-
-
                 let pasteboardOptions = [
                     UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(60 * 5)
                 ]
+
+                let logMessage = "Pasteboard Items: \(pasteboardItems)"
+                            print(logMessage) // For console logging
+                            sendLog(logMessage)
+
                 UIPasteboard.general.setItems(pasteboardItems, options: pasteboardOptions)
                 UIApplication.shared.open(instagramURL, options: [:])
                 result(self.SUCCESS)
