@@ -532,7 +532,17 @@ public class ShareUtil{
                     ]
                 ]
 
-                print("LBLBLBL", pasteboardItems: "")
+                // Convert pasteboardItems to a serializable format
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: pasteboardItems, options: []) {
+                        if let jsonString = String(data: jsonData, encoding: .utf8) {
+                            // Send the log back via result
+                            result(jsonString)
+                        } else {
+                            result(FlutterError(code: "LOG_ERROR", message: "Failed to encode log", details: nil))
+                        }
+                    } else {
+                        result(FlutterError(code: "LOG_ERROR", message: "Failed to serialize log", details: nil))
+                    }
 
 
                 let pasteboardOptions = [
